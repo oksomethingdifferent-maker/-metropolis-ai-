@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>METROPOLIS AI - Day 1</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background: #000000;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+        }
+        
+        #hud {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            background: rgba(0, 20, 0, 0.9);
+            border-bottom: 2px solid #00ff41;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            font-size: 12px;
+        }
+        
+        #hud .title {
+            font-size: 14px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ff41;
+        }
+        
+        #city {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -40%);
+            display: grid;
+            grid-template-columns: repeat(10, 28px);
+            grid-template-rows: repeat(10, 28px);
+            gap: 2px;
+        }
+        
+        .cell {
+            width: 28px; height: 28px;
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .cell:hover {
+            border-color: #00ff41;
+            box-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
+        }
+        
+        .district {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 7px;
+            text-align: center;
+            line-height: 1.1;
+            font-weight: bold;
+        }
+        
+        .power-plant {
+            background: #001133;
+            border-color: #0088ff;
+            color: #0088ff;
+            box-shadow: 0 0 15px rgba(0, 136, 255, 0.4);
+            animation: pulse-blue 2s infinite;
+        }
+        
+        .finance-hub {
+            background: #001100;
+            border-color: #00ff41;
+            color: #00ff41;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.4);
+            animation: pulse-green 2s infinite;
+        }
+        
+        .content-factory {
+            background: #110011;
+            border-color: #ff00ff;
+            color: #ff00ff;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.4);
+            animation: pulse-purple 2s infinite;
+        }
+        
+        @keyframes pulse-blue {
+            0%, 100% { box-shadow: 0 0 10px rgba(0,136,255,0.3); }
+            50% { box-shadow: 0 0 20px rgba(0,136,255,0.6); }
+        }
+        
+        @keyframes pulse-green {
+            0%, 100% { box-shadow: 0 0 10px rgba(0,255,65,0.3); }
+            50% { box-shadow: 0 0 20px rgba(0,255,65,0.6); }
+        }
+        
+        @keyframes pulse-purple {
+            0%, 100% { box-shadow: 0 0 10px rgba(255,0,255,0.3); }
+            50% { box-shadow: 0 0 20px rgba(255,0,255,0.6); }
+        }
+        
+        #terminal {
+            display: none;
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 10, 0, 0.95);
+            border: 2px solid #00ff41;
+            padding: 20px;
+            min-width: 280px;
+            max-width: 90vw;
+            z-index: 200;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+        }
+        
+        #terminal.active { display: block; }
+        
+        #terminal h3 {
+            color: #00ff41;
+            margin-bottom: 12px;
+            text-shadow: 0 0 10px #00ff41;
+            font-size: 16px;
+        }
+        
+        #terminal .info {
+            margin: 8px 0;
+            font-size: 12px;
+            color: #00aa00;
+        }
+        
+        #terminal .btn {
+            background: transparent;
+            border: 1px solid #00ff41;
+            color: #00ff41;
+            padding: 8px 16px;
+            margin-top: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            width: 100%;
+        }
+        
+        #terminal .close {
+            position: absolute;
+            top: 8px; right: 12px;
+            color: #ff4444;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        #jarvis-log {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(0, 10, 0, 0.9);
+            border-top: 1px solid #00ff41;
+            padding: 8px 12px;
+            font-size: 11px;
+            color: #00aa00;
+            z-index: 100;
+        }
+        
+        #jarvis-log .label {
+            color: #00ff41;
+            font-weight: bold;
+        }
+        
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 150;
+        }
+        
+        #overlay.active { display: block; }
+    </style>
+</head>
+<body>
+    <div id="hud">
+        <div class="title">METROPOLIS AI</div>
+        <div>DAY: <span id="day-display">1</span></div>
+        <div>STATUS: <span id="status-display">INITIALIZING</span></div>
+    </div>
+    
+    <div id="city"></div>
+    
+    <div id="overlay" onclick="closeTerminal()"></div>
+    <div id="terminal">
+        <span class="close" onclick="closeTerminal()">x</span>
+        <h3 id="term-title">DISTRICT</h3>
+        <div class="info">Status: <span id="term-status">OFFLINE</span></div>
+        <div class="info">API: <span id="term-api">Not connected</span></div>
+        <button class="btn" onclick="connectAPI()">CONNECT API</button>
+    </div>
+    
+    <div id="jarvis-log">
+        <span class="label">J.A.R.V.I.S.></span> <span id="log-text">Day 1: Foundation laid. Awaiting directives.</span>
+    </div>
+    
+    <script>
+        const cityState = {
+            day: 1,
+            status: 'INITIALIZING',
+            districts: {
+                'power-plant': { name: 'POWER PLANT', status: 'OFFLINE', api: 'NVIDIA Build', color: '#0088ff', row: 1, col: 1 },
+                'finance-hub': { name: 'FINANCE HUB', status: 'OFFLINE', api: 'Stripe/PayPal', color: '#00ff41', row: 5, col: 5 },
+                'content-factory': { name: 'CONTENT FACTORY', status: 'OFFLINE', api: 'YouTube/TikTok', color: '#ff00ff', row: 9, col: 9 }
+            }
+        };
+        
+        function saveState() {
+            localStorage.setItem('metropolis-state', JSON.stringify(cityState));
+        }
+        
+        function loadState() {
+            const saved = localStorage.getItem('metropolis-state');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                cityState.day = parsed.day || 1;
+                cityState.status = parsed.status || 'INITIALIZING';
+                Object.assign(cityState.districts, parsed.districts || {});
+            }
+        }
+        
+        function buildGrid() {
+            const city = document.getElementById('city');
+            city.innerHTML = '';
+            
+            for (let row = 0; row < 10; row++) {
+                for (let col = 0; col < 10; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.row = row;
+                    cell.dataset.col = col;
+                    
+                    for (const [key, district] of Object.entries(cityState.districts)) {
+                        if (district.row === row && district.col === col) {
+                            cell.classList.add('district', key);
+                            cell.innerHTML = district.name.replace(' ', '<br>');
+                            cell.onclick = () => openTerminal(key);
+                        }
+                    }
+                    
+                    city.appendChild(cell);
+                }
+            }
+        }
+        
+        let currentDistrict = null;
+        
+        function openTerminal(districtKey) {
+            currentDistrict = districtKey;
+            const d = cityState.districts[districtKey];
+            document.getElementById('term-title').textContent = d.name;
+            document.getElementById('term-title').style.color = d.color;
+            document.getElementById('term-status').textContent = d.status;
+            document.getElementById('term-api').textContent = d.api;
+            document.getElementById('terminal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+        
+        function closeTerminal() {
+            document.getElementById('terminal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+            currentDistrict = null;
+        }
+        
+        function connectAPI() {
+            if (!currentDistrict) return;
+            const d = cityState.districts[currentDistrict];
+            d.status = 'ONLINE';
+            document.getElementById('term-status').textContent = 'ONLINE';
+            document.getElementById('term-status').style.color = '#00ff41';
+            saveState();
+            document.getElementById('log-text').textContent = d.name + ' API connected. Systems nominal.';
+        }
+        
+        loadState();
+        buildGrid();
+        saveState();
+        
+        document.getElementById('day-display').textContent = cityState.day;
+        document.getElementById('status-display').textContent = cityState.status;
+    </script>
+</body>
+</html>
