@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>METROPOLIS AI - Day 1</title>
+    <title>METROPOLIS AI — Day 2 | Income Engine Online</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -11,47 +11,68 @@
             background: #000000;
             color: #00ff41;
             font-family: 'Courier New', monospace;
-            overflow: hidden;
-            height: 100vh;
+            overflow-x: hidden;
+            min-height: 100vh;
             width: 100vw;
         }
         
         #hud {
             position: fixed;
             top: 0; left: 0; right: 0;
-            background: rgba(0, 20, 0, 0.9);
+            background: rgba(0, 20, 0, 0.95);
             border-bottom: 2px solid #00ff41;
             padding: 8px 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 100;
-            font-size: 12px;
+            font-size: 11px;
+            flex-wrap: wrap;
+            gap: 4px;
         }
         
         #hud .title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             text-shadow: 0 0 10px #00ff41;
         }
         
+        #hud .earnings {
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 0 0 8px #ffd700;
+        }
+        
+        #main {
+            padding-top: 50px;
+            padding-bottom: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        
         #city {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -40%);
             display: grid;
-            grid-template-columns: repeat(10, 28px);
-            grid-template-rows: repeat(10, 28px);
+            grid-template-columns: repeat(10, 26px);
+            grid-template-rows: repeat(10, 26px);
             gap: 2px;
+            margin: 8px auto;
         }
         
         .cell {
-            width: 28px; height: 28px;
+            width: 26px; height: 26px;
             background: #0a0a0a;
             border: 1px solid #1a1a1a;
             position: relative;
             cursor: pointer;
             transition: all 0.3s;
+            font-size: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            line-height: 1;
         }
         
         .cell:hover {
@@ -60,21 +81,21 @@
         }
         
         .district {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 7px;
-            text-align: center;
-            line-height: 1.1;
             font-weight: bold;
+            font-size: 6px;
         }
         
         .power-plant {
             background: #001133;
             border-color: #0088ff;
             color: #0088ff;
-            box-shadow: 0 0 15px rgba(0, 136, 255, 0.4);
+            box-shadow: 0 0 15px rgba(0, 136, 255, 0.5);
             animation: pulse-blue 2s infinite;
+        }
+        
+        .power-plant.online {
+            background: #002255;
+            box-shadow: 0 0 25px rgba(0, 136, 255, 0.8);
         }
         
         .finance-hub {
@@ -93,9 +114,17 @@
             animation: pulse-purple 2s infinite;
         }
         
+        .income-module {
+            background: #1a1000;
+            border-color: #ffaa00;
+            color: #ffaa00;
+            box-shadow: 0 0 15px rgba(255, 170, 0, 0.4);
+            animation: pulse-gold 2s infinite;
+        }
+        
         @keyframes pulse-blue {
             0%, 100% { box-shadow: 0 0 10px rgba(0,136,255,0.3); }
-            50% { box-shadow: 0 0 20px rgba(0,136,255,0.6); }
+            50% { box-shadow: 0 0 25px rgba(0,136,255,0.7); }
         }
         
         @keyframes pulse-green {
@@ -108,27 +137,33 @@
             50% { box-shadow: 0 0 20px rgba(255,0,255,0.6); }
         }
         
+        @keyframes pulse-gold {
+            0%, 100% { box-shadow: 0 0 10px rgba(255,170,0,0.3); }
+            50% { box-shadow: 0 0 20px rgba(255,170,0,0.6); }
+        }
+        
         #terminal {
             display: none;
             position: fixed;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 10, 0, 0.95);
-            border: 2px solid #00ff41;
-            padding: 20px;
-            min-width: 280px;
-            max-width: 90vw;
+            background: rgba(0, 10, 0, 0.97);
+            border: 2px solid;
+            padding: 16px;
+            min-width: 300px;
+            max-width: 92vw;
+            max-height: 80vh;
+            overflow-y: auto;
             z-index: 200;
-            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+            box-shadow: 0 0 40px rgba(0, 255, 65, 0.2);
         }
         
         #terminal.active { display: block; }
         
         #terminal h3 {
-            color: #00ff41;
             margin-bottom: 12px;
-            text-shadow: 0 0 10px #00ff41;
-            font-size: 16px;
+            text-shadow: 0 0 10px;
+            font-size: 15px;
         }
         
         #terminal .info {
@@ -139,28 +174,113 @@
         
         #terminal .btn {
             background: transparent;
-            border: 1px solid #00ff41;
-            color: #00ff41;
+            border: 1px solid;
             padding: 8px 16px;
-            margin-top: 12px;
+            margin-top: 8px;
             cursor: pointer;
             font-family: inherit;
             font-size: 12px;
             width: 100%;
+            color: inherit;
+        }
+        
+        #terminal .btn:hover {
+            opacity: 0.8;
         }
         
         #terminal .close {
             position: absolute;
-            top: 8px; right: 12px;
+            top: 6px; right: 10px;
             color: #ff4444;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 18px;
+        }
+        
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 150;
+        }
+        
+        #overlay.active { display: block; }
+        
+        #income-dash {
+            width: 92vw;
+            max-width: 500px;
+            background: rgba(10, 10, 0, 0.9);
+            border: 1px solid #ffaa00;
+            padding: 12px;
+            margin: 8px auto;
+        }
+        
+        #income-dash h2 {
+            color: #ffaa00;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #ffaa00;
+        }
+        
+        .income-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #1a1a00;
+            font-size: 12px;
+        }
+        
+        .income-row .amount {
+            color: #ffd700;
+            font-weight: bold;
+        }
+        
+        .module-section {
+            width: 92vw;
+            max-width: 500px;
+            background: rgba(0, 10, 0, 0.9);
+            border: 1px solid;
+            padding: 12px;
+            margin: 4px auto;
+        }
+        
+        .module-section h3 {
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        
+        .module-section input, .module-section textarea, .module-section select {
+            width: 100%;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            color: #00ff41;
+            padding: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            margin: 4px 0;
+        }
+        
+        .module-section input:focus, .module-section textarea:focus {
+            outline: none;
+            border-color: #00ff41;
+        }
+        
+        .output-box {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            padding: 8px;
+            margin-top: 8px;
+            font-size: 11px;
+            min-height: 40px;
+            white-space: pre-wrap;
+            word-break: break-word;
         }
         
         #jarvis-log {
             position: fixed;
             bottom: 0; left: 0; right: 0;
-            background: rgba(0, 10, 0, 0.9);
+            background: rgba(0, 10, 0, 0.95);
             border-top: 1px solid #00ff41;
             padding: 8px 12px;
             font-size: 11px;
@@ -173,47 +293,175 @@
             font-weight: bold;
         }
         
-        #overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            z-index: 150;
+        .particle {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float-up 3s ease-out forwards;
         }
         
-        #overlay.active { display: block; }
+        @keyframes float-up {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-60px) scale(0); }
+        }
+        
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #00ff41; }
+        
+        .status-online { color: #00ff41 !important; }
+        .status-offline { color: #ff4444 !important; }
     </style>
 </head>
 <body>
     <div id="hud">
         <div class="title">METROPOLIS AI</div>
-        <div>DAY: <span id="day-display">1</span></div>
-        <div>STATUS: <span id="status-display">INITIALIZING</span></div>
+        <div>DAY: <span id="day-display">2</span></div>
+        <div class="earnings">$<span id="earnings-display">0.00</span></div>
+        <div>STATUS: <span id="status-display">OPERATIONAL</span></div>
     </div>
     
-    <div id="city"></div>
+    <div id="main">
+        <div id="city"></div>
+        
+        <div id="income-dash">
+            <h2>▼ INCOME DASHBOARD ▼</h2>
+            <div class="income-row">
+                <span>Affiliate Clicks (Today)</span>
+                <span class="amount" id="affiliate-clicks">0</span>
+            </div>
+            <div class="income-row">
+                <span>Leads Captured</span>
+                <span class="amount" id="leads-captured">0</span>
+            </div>
+            <div class="income-row">
+                <span>Content Generated</span>
+                <span class="amount" id="content-count">0</span>
+            </div>
+            <div class="income-row">
+                <span>Projected Daily</span>
+                <span class="amount" id="projected-daily">$0.00</span>
+            </div>
+            <div class="income-row">
+                <span>Projected Monthly</span>
+                <span class="amount" id="projected-monthly">$0.00</span>
+            </div>
+        </div>
+        
+        <div class="module-section" style="border-color: #ffaa00;">
+            <h3 style="color: #ffaa00;">⚡ AFFILIATE LINK ROTATOR</h3>
+            <div style="font-size: 11px; color: #aa8800; margin-bottom: 8px;">
+                Add your affiliate links. The rotator cycles them and tracks clicks.
+            </div>
+            <input type="text" id="affiliate-name" placeholder="Link name (e.g. Amazon Deals)">
+            <input type="url" id="affiliate-url" placeholder="https://your-affiliate-link.com">
+            <button class="btn" style="border-color: #ffaa00; color: #ffaa00;" onclick="addAffiliateLink()">ADD LINK</button>
+            <div class="output-box" id="affiliate-list" style="border-color: #ffaa00;">No links added yet.</div>
+            <button class="btn" style="border-color: #00ff41; color: #00ff41; margin-top: 8px;" onclick="rotateAffiliateLink()">🔄 ROTATE & GET LINK</button>
+            <div class="output-box" id="rotated-link" style="border-color: #00ff41; min-height: 60px;">Click ROTATE to get your next affiliate link.</div>
+        </div>
+        
+        <div class="module-section" style="border-color: #ff00ff;">
+            <h3 style="color: #ff00ff;">📝 CONTENT AUTO-GENERATOR</h3>
+            <div style="font-size: 11px; color: #aa00aa; margin-bottom: 8px;">
+                Generate SEO titles, descriptions, hashtags for thumbnails/products.
+            </div>
+            <select id="content-type">
+                <option value="youtube">YouTube Title + Description</option>
+                <option value="etsy">Etsy Product Listing</option>
+                <option value="thumbnail">Thumbnail Text Ideas</option>
+                <option value="social">Social Media Caption</option>
+            </select>
+            <input type="text" id="content-topic" placeholder="Topic or product name (e.g. 'Gaming Mouse RGB')">
+            <button class="btn" style="border-color: #ff00ff; color: #ff00ff;" onclick="generateContent()">GENERATE CONTENT</button>
+            <div class="output-box" id="content-output" style="border-color: #ff00ff;">Content will appear here...</div>
+            <button class="btn" style="border-color: #0088ff; color: #0088ff; margin-top: 6px;" onclick="copyContent()">📋 COPY TO CLIPBOARD</button>
+        </div>
+        
+        <div class="module-section" style="border-color: #0088ff;">
+            <h3 style="color: #0088ff;">📧 LEAD CAPTURE FORM</h3>
+            <div style="font-size: 11px; color: #0066aa; margin-bottom: 8px;">
+                Collect emails. Export as CSV. Sell services to them later.
+            </div>
+            <input type="text" id="lead-name" placeholder="Name">
+            <input type="email" id="lead-email" placeholder="Email">
+            <input type="text" id="lead-interest" placeholder="Interest (e.g. Thumbnails, Gaming Gear)">
+            <button class="btn" style="border-color: #0088ff; color: #0088ff;" onclick="addLead()">CAPTURE LEAD</button>
+            <div class="output-box" id="lead-list" style="border-color: #0088ff;">No leads yet.</div>
+            <button class="btn" style="border-color: #ffd700; color: #ffd700; margin-top: 6px;" onclick="exportLeads()">📤 EXPORT LEADS (CSV)</button>
+        </div>
+        
+        <div class="module-section" style="border-color: #00ff41;">
+            <h3 style="color: #00ff41;">⏱️ AUTOMATION TIMER</h3>
+            <div style="font-size: 11px; color: #00aa00; margin-bottom: 8px;">
+                Set reminders for tasks that generate income. Runs in your browser.
+            </div>
+            <input type="text" id="task-name" placeholder="Task (e.g. Post affiliate link on Reddit)">
+            <input type="number" id="task-interval" placeholder="Interval in minutes" value="60">
+            <button class="btn" style="border-color: #00ff41; color: #00ff41;" onclick="addTask()">START TASK TIMER</button>
+            <div class="output-box" id="task-list" style="border-color: #00ff41;">No active timers.</div>
+        </div>
+    </div>
     
     <div id="overlay" onclick="closeTerminal()"></div>
     <div id="terminal">
-        <span class="close" onclick="closeTerminal()">x</span>
+        <span class="close" onclick="closeTerminal()">×</span>
         <h3 id="term-title">DISTRICT</h3>
         <div class="info">Status: <span id="term-status">OFFLINE</span></div>
         <div class="info">API: <span id="term-api">Not connected</span></div>
-        <button class="btn" onclick="connectAPI()">CONNECT API</button>
+        <div class="info" id="term-extra"></div>
+        <button class="btn" id="term-btn" onclick="connectAPI()">CONNECT API</button>
     </div>
     
     <div id="jarvis-log">
-        <span class="label">J.A.R.V.I.S.></span> <span id="log-text">Day 1: Foundation laid. Awaiting directives.</span>
+        <span class="label">J.A.R.V.I.S.></span> <span id="log-text">Day 2: Power Plant ONLINE. Income engines armed. Awaiting directives.</span>
     </div>
     
     <script>
         const cityState = {
-            day: 1,
-            status: 'INITIALIZING',
+            day: 2,
+            status: 'OPERATIONAL',
+            earnings: 0,
             districts: {
-                'power-plant': { name: 'POWER PLANT', status: 'OFFLINE', api: 'NVIDIA Build', color: '#0088ff', row: 1, col: 1 },
-                'finance-hub': { name: 'FINANCE HUB', status: 'OFFLINE', api: 'Stripe/PayPal', color: '#00ff41', row: 5, col: 5 },
-                'content-factory': { name: 'CONTENT FACTORY', status: 'OFFLINE', api: 'YouTube/TikTok', color: '#ff00ff', row: 9, col: 9 }
-            }
+                'power-plant': { 
+                    name: 'POWER PLANT', 
+                    status: 'ONLINE', 
+                    api: 'NVIDIA Build', 
+                    color: '#0088ff', 
+                    row: 1, col: 1,
+                    extra: 'Compute Quota: 85%\nUptime: 99.9%'
+                },
+                'finance-hub': { 
+                    name: 'FINANCE HUB', 
+                    status: 'ONLINE', 
+                    api: 'Stripe/PayPal', 
+                    color: '#00ff41', 
+                    row: 5, col: 5,
+                    extra: 'Transactions: 0\nRevenue: $0.00'
+                },
+                'content-factory': { 
+                    name: 'CONTENT FACTORY', 
+                    status: 'ONLINE', 
+                    api: 'YouTube/TikTok', 
+                    color: '#ff00ff', 
+                    row: 9, col: 9,
+                    extra: 'Videos: 0\nScheduled: 0'
+                },
+                'income-engine': {
+                    name: 'INCOME ENGINE',
+                    status: 'ONLINE',
+                    api: 'Affiliate/LeadGen',
+                    color: '#ffaa00',
+                    row: 3, col: 7,
+                    extra: 'Links: 0\nLeads: 0\nClicks: 0'
+                }
+            },
+            affiliates: [],
+            leads: [],
+            contentGenerated: 0,
+            tasks: []
         };
         
         function saveState() {
@@ -224,9 +472,11 @@
             const saved = localStorage.getItem('metropolis-state');
             if (saved) {
                 const parsed = JSON.parse(saved);
-                cityState.day = parsed.day || 1;
-                cityState.status = parsed.status || 'INITIALIZING';
-                Object.assign(cityState.districts, parsed.districts || {});
+                Object.assign(cityState, parsed);
+                if (!cityState.affiliates) cityState.affiliates = [];
+                if (!cityState.leads) cityState.leads = [];
+                if (!cityState.contentGenerated) cityState.contentGenerated = 0;
+                if (!cityState.tasks) cityState.tasks = [];
             }
         }
         
@@ -244,8 +494,15 @@
                     for (const [key, district] of Object.entries(cityState.districts)) {
                         if (district.row === row && district.col === col) {
                             cell.classList.add('district', key);
+                            if (district.status === 'ONLINE') cell.classList.add('online');
                             cell.innerHTML = district.name.replace(' ', '<br>');
+                            cell.style.color = district.color;
+                            cell.style.borderColor = district.color;
                             cell.onclick = () => openTerminal(key);
+                            
+                            if (district.status === 'ONLINE') {
+                                setInterval(() => spawnParticle(cell, district.color), 2000 + Math.random() * 2000);
+                            }
                         }
                     }
                     
@@ -254,16 +511,46 @@
             }
         }
         
+        function spawnParticle(cell, color) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.background = color;
+            p.style.left = (Math.random() * 20 + 3) + 'px';
+            p.style.top = (Math.random() * 10 + 10) + 'px';
+            cell.appendChild(p);
+            setTimeout(() => p.remove(), 3000);
+        }
+        
         let currentDistrict = null;
         
         function openTerminal(districtKey) {
             currentDistrict = districtKey;
             const d = cityState.districts[districtKey];
+            const term = document.getElementById('terminal');
+            term.style.borderColor = d.color;
             document.getElementById('term-title').textContent = d.name;
             document.getElementById('term-title').style.color = d.color;
-            document.getElementById('term-status').textContent = d.status;
+            document.getElementById('term-title').style.textShadow = `0 0 10px ${d.color}`;
+            
+            const statusEl = document.getElementById('term-status');
+            statusEl.textContent = d.status;
+            statusEl.className = d.status === 'ONLINE' ? 'status-online' : 'status-offline';
+            
             document.getElementById('term-api').textContent = d.api;
-            document.getElementById('terminal').classList.add('active');
+            document.getElementById('term-extra').innerHTML = d.extra ? d.extra.replace(/\n/g, '<br>') : '';
+            
+            const btn = document.getElementById('term-btn');
+            if (d.status === 'ONLINE') {
+                btn.textContent = 'DISCONNECT';
+                btn.style.borderColor = '#ff4444';
+                btn.style.color = '#ff4444';
+            } else {
+                btn.textContent = 'CONNECT API';
+                btn.style.borderColor = d.color;
+                btn.style.color = d.color;
+            }
+            
+            term.classList.add('active');
             document.getElementById('overlay').classList.add('active');
         }
         
@@ -276,19 +563,300 @@
         function connectAPI() {
             if (!currentDistrict) return;
             const d = cityState.districts[currentDistrict];
-            d.status = 'ONLINE';
-            document.getElementById('term-status').textContent = 'ONLINE';
-            document.getElementById('term-status').style.color = '#00ff41';
+            d.status = d.status === 'ONLINE' ? 'OFFLINE' : 'ONLINE';
             saveState();
-            document.getElementById('log-text').textContent = d.name + ' API connected. Systems nominal.';
+            openTerminal(currentDistrict);
+            updateLog(`${d.name} ${d.status === 'ONLINE' ? 'connected' : 'disconnected'}.`);
+            updateDashboard();
+        }
+        
+        function updateLog(message) {
+            document.getElementById('log-text').textContent = message;
+        }
+        
+        function addAffiliateLink() {
+            const name = document.getElementById('affiliate-name').value.trim();
+            const url = document.getElementById('affiliate-url').value.trim();
+            
+            if (!name || !url) {
+                alert('Enter both name and URL');
+                return;
+            }
+            
+            cityState.affiliates.push({ name, url, clicks: 0, added: new Date().toISOString() });
+            saveState();
+            renderAffiliateList();
+            updateDistrictExtra('income-engine');
+            document.getElementById('affiliate-name').value = '';
+            document.getElementById('affiliate-url').value = '';
+            updateLog(`Affiliate link "${name}" added to rotator.`);
+        }
+        
+        function renderAffiliateList() {
+            const box = document.getElementById('affiliate-list');
+            if (cityState.affiliates.length === 0) {
+                box.textContent = 'No links added yet.';
+                return;
+            }
+            box.innerHTML = cityState.affiliates.map((a, i) => 
+                `[${i+1}] ${a.name} | Clicks: ${a.clicks}`
+            ).join('<br>');
+        }
+        
+        function rotateAffiliateLink() {
+            if (cityState.affiliates.length === 0) {
+                document.getElementById('rotated-link').textContent = 'Add links first!';
+                return;
+            }
+            
+            const idx = Math.floor(Math.random() * cityState.affiliates.length);
+            const link = cityState.affiliates[idx];
+            link.clicks++;
+            saveState();
+            
+            document.getElementById('rotated-link').innerHTML = 
+                `<strong>${link.name}</strong><br><br>${link.url}<br><br>(Clicks: ${link.clicks})<br><br><a href="${link.url}" target="_blank" style="color:#00ff41;">[OPEN LINK]</a>`;
+            
+            updateDashboard();
+            updateDistrictExtra('income-engine');
+            updateLog(`Rotated to: ${link.name} | Total clicks: ${link.clicks}`);
+        }
+        
+        function generateContent() {
+            const type = document.getElementById('content-type').value;
+            const topic = document.getElementById('content-topic').value.trim() || 'Product';
+            const output = document.getElementById('content-output');
+            
+            let result = '';
+            
+            switch(type) {
+                case 'youtube':
+                    result = `🎬 YOUTUBE CONTENT PACK\n\n` +
+                        `TITLE: "${topic} — The Truth Nobody Tells You (2026)"\n` +
+                        `ALT: "I Tested ${topic} for 30 Days — Here's What Happened"\n` +
+                        `ALT: "${topic} Review: Worth It or Scam?"\n\n` +
+                        `DESCRIPTION:\n` +
+                        `🔥 ${topic} breakdown — everything you need to know.\n` +
+                        `⏱️ Timestamps in comments\n` +
+                        `👇 LINK IN DESCRIPTION for the best deal\n\n` +
+                        `TAGS: #${topic.replace(/\s+/g,'')} #review #2026 #mustwatch`;
+                    break;
+                case 'etsy':
+                    result = `🏪 ETSY LISTING\n\n` +
+                        `TITLE: ${topic} | Handmade Custom | Perfect Gift | Free Shipping\n\n` +
+                        `DESCRIPTION:\n` +
+                        `✨ Premium ${topic} — handcrafted with care\n` +
+                        `🎁 Perfect gift for any occasion\n` +
+                        `📦 Free shipping on orders over $35\n` +
+                        `⭐ 5-star rated by 200+ customers\n\n` +
+                        `TAGS: ${topic}, handmade, custom, gift, unique, trending`;
+                    break;
+                case 'thumbnail':
+                    result = `🖼️ THUMBNAIL TEXT IDEAS\n\n` +
+                        `1. "STOP! Read This First"\n` +
+                        `2. "I Was Wrong About ${topic}"\n` +
+                        `3. "${topic} Exposed 😱"\n` +
+                        `4. "Save $$$ on ${topic}"\n` +
+                        `5. "Why I Regret Buying ${topic}"\n` +
+                        `6. "${topic} vs Cheap Alternative"\n` +
+                        `7. "Before You Buy ${topic}..."`;
+                    break;
+                case 'social':
+                    result = `📱 SOCIAL MEDIA CAPTION\n\n` +
+                        `Just got my hands on ${topic} and WOW 🔥\n\n` +
+                        `Here's 3 things I learned in the first hour:\n` +
+                        `1. It's lighter than expected\n` +
+                        `2. Setup took under 5 mins\n` +
+                        `3. The reviews were RIGHT\n\n` +
+                        `Link in bio if you want the same deal I got 👆\n` +
+                        `Use code SAVE10 for extra off!\n\n` +
+                        `#${topic.replace(/\s+/g,'')} #musthave #deals #2026`;
+                    break;
+            }
+            
+            output.textContent = result;
+            cityState.contentGenerated++;
+            saveState();
+            updateDashboard();
+            updateLog(`Content generated: ${type} for "${topic}"`);
+        }
+        
+        function copyContent() {
+            const text = document.getElementById('content-output').textContent;
+            if (!text || text === 'Content will appear here...') return;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                updateLog('Content copied to clipboard. Paste and post!');
+            }).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                updateLog('Content copied to clipboard.');
+            });
+        }
+        
+        function addLead() {
+            const name = document.getElementById('lead-name').value.trim();
+            const email = document.getElementById('lead-email').value.trim();
+            const interest = document.getElementById('lead-interest').value.trim();
+            
+            if (!name || !email) {
+                alert('Name and email required');
+                return;
+            }
+            
+            cityState.leads.push({
+                name, email, interest: interest || 'General',
+                date: new Date().toISOString()
+            });
+            saveState();
+            renderLeadList();
+            updateDistrictExtra('income-engine');
+            
+            document.getElementById('lead-name').value = '';
+            document.getElementById('lead-email').value = '';
+            document.getElementById('lead-interest').value = '';
+            
+            updateDashboard();
+            updateLog(`Lead captured: ${name} (${email})`);
+        }
+        
+        function renderLeadList() {
+            const box = document.getElementById('lead-list');
+            if (cityState.leads.length === 0) {
+                box.textContent = 'No leads yet.';
+                return;
+            }
+            box.innerHTML = cityState.leads.map((l, i) => 
+                `[${i+1}] ${l.name} | ${l.email} | ${l.interest}`
+            ).join('<br>');
+        }
+        
+        function exportLeads() {
+            if (cityState.leads.length === 0) {
+                alert('No leads to export');
+                return;
+            }
+            
+            const csv = 'Name,Email,Interest,Date\n' +
+                cityState.leads.map(l => 
+                    `"${l.name}","${l.email}","${l.interest}","${l.date}"`
+                ).join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `metropolis-leads-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            updateLog(`Exported ${cityState.leads.length} leads to CSV.`);
+        }
+        
+        function addTask() {
+            const name = document.getElementById('task-name').value.trim();
+            const interval = parseInt(document.getElementById('task-interval').value) || 60;
+            
+            if (!name) {
+                alert('Enter a task name');
+                return;
+            }
+            
+            const task = {
+                name,
+                interval,
+                nextRun: Date.now() + interval * 60000,
+                runs: 0
+            };
+            
+            cityState.tasks.push(task);
+            saveState();
+            renderTasks();
+            
+            document.getElementById('task-name').value = '';
+            updateLog(`Timer started: "${name}" every ${interval} min`);
+        }
+        
+        function renderTasks() {
+            const box = document.getElementById('task-list');
+            if (cityState.tasks.length === 0) {
+                box.textContent = 'No active timers.';
+                return;
+            }
+            
+            const now = Date.now();
+            box.innerHTML = cityState.tasks.map((t, i) => {
+                const minsLeft = Math.max(0, Math.ceil((t.nextRun - now) / 60000));
+                return `[${i+1}] ${t.name} | ${minsLeft}m left | Runs: ${t.runs}`;
+            }).join('<br>');
+        }
+        
+        setInterval(() => {
+            const now = Date.now();
+            let changed = false;
+            
+            cityState.tasks.forEach(t => {
+                if (now >= t.nextRun) {
+                    t.runs++;
+                    t.nextRun = now + t.interval * 60000;
+                    changed = true;
+                    updateLog(`⏰ TASK DUE: "${t.name}" — Run #${t.runs}`);
+                    if ('vibrate' in navigator) navigator.vibrate([200, 100, 200]);
+                }
+            });
+            
+            if (changed) {
+                saveState();
+                renderTasks();
+            }
+        }, 30000);
+        
+        function updateDashboard() {
+            const totalClicks = cityState.affiliates.reduce((sum, a) => sum + a.clicks, 0);
+            const leadCount = cityState.leads.length;
+            const contentCount = cityState.contentGenerated;
+            
+            const projectedDaily = (totalClicks * 0.10) + (leadCount * 0.50) + (contentCount * 0.20);
+            const projectedMonthly = projectedDaily * 30;
+            
+            document.getElementById('affiliate-clicks').textContent = totalClicks;
+            document.getElementById('leads-captured').textContent = leadCount;
+            document.getElementById('content-count').textContent = contentCount;
+            document.getElementById('projected-daily').textContent = '$' + projectedDaily.toFixed(2);
+            document.getElementById('projected-monthly').textContent = '$' + projectedMonthly.toFixed(2);
+            document.getElementById('earnings-display').textContent = projectedDaily.toFixed(2);
+        }
+        
+        function updateDistrictExtra(key) {
+            const d = cityState.districts[key];
+            if (key === 'income-engine') {
+                const totalClicks = cityState.affiliates.reduce((sum, a) => sum + a.clicks, 0);
+                d.extra = `Links: ${cityState.affiliates.length}\nLeads: ${cityState.leads.length}\nClicks: ${totalClicks}`;
+                saveState();
+            }
         }
         
         loadState();
         buildGrid();
-        saveState();
+        renderAffiliateList();
+        renderLeadList();
+        renderTasks();
+        updateDashboard();
         
         document.getElementById('day-display').textContent = cityState.day;
         document.getElementById('status-display').textContent = cityState.status;
+        
+        setInterval(() => {
+            saveState();
+        }, 30000);
+        
+        updateLog('Day 2: All systems operational. Income engines ready.');
     </script>
 </body>
 </html>
